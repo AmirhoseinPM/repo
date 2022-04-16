@@ -1,0 +1,79 @@
+import math
+import argparse
+
+parser = argparse.ArgumentParser(description="this program help you to calculate loan variable")
+
+parser.add_argument("--type", choices=["diff", "annuity"],
+                    default=None, help="please choose type calculating")
+parser.add_argument("--periods", type=int,
+                    default=None, help="please enter number of monthly payment")
+parser.add_argument("--interest", type=float,
+                    default=None, help="please enter annual interest rate")
+parser.add_argument("--principal", type=int,
+                    default=None, help="please enter loan principal")
+parser.add_argument("--payment", type=int,
+                    default=None, help="please enter monthly payment")
+
+args = parser.parse_args()
+
+
+arg_num = 0
+if args.principal:
+    arg_num +=1
+if args.periods:
+    arg_num +=1
+if args.interest:
+    arg_num +=1
+if args.payment:
+    arg_num +=1
+if args.type:
+    arg_num +=1
+if args.interest:
+    i = args.interest / (12 * 100)
+sum_pay = 0
+n = 0
+pay = 0
+p = 0
+
+if arg_num < 4:
+    print("Incorrect parameters.")
+elif not args.type:
+    print("Incorrect parameters.")
+elif args.type == "diff":
+    if not args.payment:
+        for x in range(args.periods):
+            pay = (args.principal / args.periods) + (i * (args.principal - (args.principal * x / args.periods)))
+            print("Month {0}: payment is {1}".format(x, math.ceil(pay)))
+            sum_pay += math.ceil(pay)
+        overpay = sum_pay - args.principal
+        print("overpayment = {}".format(overpay))
+    elif not args.interest:
+        print("Incorrect parameters")
+
+elif args.type == "annuity":
+    if not args.periods:
+        n = math.ceil(math.log(args.payment / (args.payment - (i * args.principal)), 1 + i))
+        years = math.floor(n / 12)
+        months = n % 12
+
+        if months > 1:
+            month_s = "months"
+        else:
+            month_s = "month"
+        if months != 0:
+            print("{0} years and {1} {2}!".format(years, months, month_s))
+        else:
+            print("{0} years!".format(years))
+        overpay = (args.payment * n) - args.principal
+        print(overpay)
+    elif not args.payment:
+        pay = math.ceil((args.principal * i * pow(1 + i, args.periods))/(pow(1 + i, args.periods)-1))
+        print(pay)
+        overpay = (pay * args.periods) - args.principal
+        print(overpay)
+    elif not args.principal:
+        p = args.payment / ((i * pow(1 + i, args.periods))/(pow(1 + i, args.periods) - 1))
+        overpay = (args.payment * args.periods) - p
+        print(overpay)
+        print(math.floor(p))
+
